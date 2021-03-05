@@ -1,114 +1,120 @@
-// GMKP.cpp : Questo file contiene la funzione 'main', in cui inizia e termina l'esecuzione del programma.
+// GMKP.cpp : this file contains the function 'main', which starts and finishes the execute of the program.
 //
 
 #include <iostream> // input/output
 #include <fstream> // read files
-#include <chrono> // get hours
 
 #include "GMKP_CPX.h"
 
-using namespace std;
-
-/*int main()
-{
+int main() {
 	// data for GMKP instance
 	int n; // number of objects
 	int m; // number of knapsacks
 	int r; // number of subsets
-	int *p; // array for linear profit term
-	int *w; // array of weights
-	int *C; // array of knapsack capacities
-	int *s; // array of setup
-	int **Rk; // array of classes
-
-	// input data from command line
-	string input; // instance file name
-	string output; // output file name
-	int TL = 100; // time limit in seconds
-	bool intflag = false;
-
-	// output data
-	double objval = 0;
-	int status = 0;
-
-	// get main args ...
-	//std::cout << "write the file name of instance: ";
-	//std::cin >> input;
-	//std::cout << "write the file name of output: ";
-	//std::cin >> output;
-	//std::cout << "write the time limit (in second): ";
-	//std::cin >> TL;
+	int *profits; // array for linear profit term
+	int *weights; // array of weights
+	int *capacities; // array of knapsack capacities
+	int *setups; // array of setup
+	int *classes; // array of classes
+	int *indexes; // array of indexes
 
 	// read instance
 	n = 6;
-	p = (int *)malloc(sizeof(int)*n);
-	w = (int *)malloc(sizeof(int)*n);
-	std::cout << "numero di elementi: " << n << "\n";
+	profits = (int *)malloc(sizeof(int)*n);
+	weights = (int *)malloc(sizeof(int)*n);
+	std::cout << "number of objects: " << n << "\n";
 
-	p[0] = 100;
-	p[1] = 49;
-	p[2] = 36;
-	p[3] = 15;
-	p[4] = 18;
-	p[5] = 15;
+	profits[0] = 100;
+	profits[1] = 49;
+	profits[2] = 36;
+	profits[3] = 15;
+	profits[4] = 18;
+	profits[5] = 15;
 
-	w[0] = 15;
-	w[1] = 10;
-	w[2] = 9;
-	w[3] = 4;
-	w[4] = 5;
-	w[5] = 5;
+	weights[0] = 15;
+	weights[1] = 10;
+	weights[2] = 9;
+	weights[3] = 4;
+	weights[4] = 5;
+	weights[5] = 5;
 
 	m = 2;
-	C = (int *)malloc(sizeof(int)*m);
-	std::cout << "numero di zaini: " << m << "\n";
+	capacities = (int *)malloc(sizeof(int)*m);
+	std::cout << "number of knapsacks: " << m << "\n";
 
-	C[0] = 30;
-	C[1] = 12;
+	capacities[0] = 30;
+	capacities[1] = 12;
 
 	r = 2;
-	s = (int *)malloc(sizeof(int)*r);
-	std::cout << "numero di classi: " << r << "\n";
+	setups = (int *)malloc(sizeof(int)*r);
+	classes = (int *)malloc(sizeof(int)*n);
+	indexes = (int *)malloc(sizeof(int)*r);
+	std::cout << "numer of classes: " << r << "\n";
 
-	s[0] = 1;
-	s[1] = 2;
+	setups[0] = 1;
+	setups[1] = 2;
 
-	Rk = (int **)malloc(sizeof(int)*r);
-	Rk[0] = (int *)malloc(sizeof(int) * 4);
-	Rk[0][0] = 0;
-	Rk[0][1] = 1;
-	Rk[0][2] = 3;
-	Rk[0][3] = 5;
-	Rk[1] = (int *)malloc(sizeof(int) * 2);
-	Rk[1][0] = 2;
-	Rk[1][1] = 4;
+	classes[0] = 0;
+	classes[1] = 1;
+	classes[2] = 3;
+	classes[3] = 5;
+	classes[4] = 2;
+	classes[5] = 4;
 
-	auto start = std::chrono::system_clock::now();
+	indexes[0] = 4;
+	indexes[1] = 6;
 
-	status = solveGMKP_CPX(n, m, r, p, w, C, s, Rk, &objval, TL, intflag);
+	IloEnv env;
+	IloModel model(env);
 
-	auto end = std::chrono::system_clock::now();
+	// set problem name
+	model.setName("Generalized Multiple Knapsack Problem");
 
-	std::chrono::duration<double> elapsed_seconds = end - start;
+	// variables (columns)
+	IloNumVarArray x(env);
+	IloNumVarArray y(env);
 
-	// print output
-	std::cout << "durata dell'operazione: " << elapsed_seconds.count() << "\n";
-	//if (status) {
-	//	printf("Si è verificato un errore! Errore numero: %d\n", status);
-	//} else {
-	//	printf("La funzione è stata eseguita correttamente\n");
-	//	printf("Il risultato è: %f", objval);
-	//}
+	// objective function
+	IloObjective obj = IloMaximize(env);
+
+	// constraints (rows)
+	IloRangeArray capacity(env);
+	IloRangeArray max_one_bin(env);
+	IloRangeArray big_m(env);
+
+	add_rows(model, capacity, max_one_bin, big_m, y, m, n, r, capacities);
+	add_columns(model, obj, capacity, max_one_bin, big_m, x, y, n, m, r, weights, profits, capacities, setups, classes, indexes);
+
+	// add all to the model:
+	model.add(obj);
+	model.add(capacity);
+	model.add(max_one_bin);
+	model.add(big_m);
+
+	IloCplex cplex(model);
+
+	// export the model into an .lp file
+	cplex.exportModel("model.lp");
+
+	// solve the problem
+	if (cplex.solve()) {
+		std::cout << "CPLEX model solved! (Status: " << cplex.getStatus() << ")" << std::endl;
+		std::cout << "The objective value is: " << cplex.getObjValue() << std::endl;
+	}
+	else {
+		std::cerr << "CPLEX failed! (Status: " << cplex.getStatus() << ", " << cplex.getCplexStatus() << ")" << std::endl;
+	}
+
+	// clean up memory
+	env.end();
 
 	// free memory
-	free(p);
-	free(w);
-	free(C);
-	free(s);
-	free(Rk);
-
-	// close file
-	
+	free(profits);
+	free(weights);
+	free(capacities);
+	free(setups);
+	free(classes);
+	free(indexes);
 
 	return 0;
-}*/
+}

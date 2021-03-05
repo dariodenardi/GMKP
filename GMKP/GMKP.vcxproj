@@ -154,8 +154,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="bp_by_columns.cpp" />
     <ClCompile Include="GMKP.cpp" />
+    <ClCompile Include="GMKP_CPX.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GMKP_CPX.h" />
