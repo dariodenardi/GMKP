@@ -82,10 +82,9 @@ int main() {
 	IloRangeArray max_one_bin(env);
 	IloRangeArray big_m(env);
 
-	add_rows(model, capacity, max_one_bin, big_m, y, m, n, r, capacities);
-	add_columns(model, obj, capacity, max_one_bin, big_m, x, y, n, m, r, weights, profits, capacities, setups, classes, indexes);
+	solveGMKP_CPX(model, obj, capacity, max_one_bin, big_m, x, y, n, m, r, weights, profits, capacities, setups, classes, indexes);
 
-	// add all to the model:
+	// add all to the model
 	model.add(obj);
 	model.add(capacity);
 	model.add(max_one_bin);

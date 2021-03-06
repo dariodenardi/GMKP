@@ -1,5 +1,14 @@
 #include "GMKP_CPX.h"
 
+void add_rows(IloModel, IloRangeArray, IloRangeArray, IloRangeArray, IloNumVarArray, int, int, int, int *);
+void add_columns(IloModel, IloObjective, IloRangeArray, IloRangeArray, IloRangeArray, IloNumVarArray, IloNumVarArray, int, int, int, int *, int *, int *, int *, int *, int *);
+
+void solveGMKP_CPX(IloModel model, IloObjective obj, IloRangeArray capacity, IloRangeArray max_one_bin, IloRangeArray big_m, IloNumVarArray x, IloNumVarArray y, int n, int m, int r, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes) {
+
+	add_rows(model, capacity, max_one_bin, big_m, y, m, n, r, capacities);
+	add_columns(model, obj, capacity, max_one_bin, big_m, x, y, n, m, r, weights, profits, capacities, setups, classes, indexes);
+}
+
 void add_rows(IloModel model, IloRangeArray capacity, IloRangeArray max_one_bin, IloRangeArray big_m, IloNumVarArray y, int m, int n, int r, int * capacities) {
 	IloEnv env = model.getEnv();
 
