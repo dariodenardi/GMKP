@@ -1,7 +1,7 @@
 # GMKP
 
 ### Requirements
-- Visual Studio 2017
+- Visual Studio
 - ILOG CPLEX Optimization Studio
 
 ### Configuration Visual Studio
