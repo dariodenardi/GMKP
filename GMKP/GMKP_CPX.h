@@ -8,7 +8,6 @@
 #include <cstring>
 #include <iostream>
 #include <sstream>
-#include <vector>
 
 void solveGMKP_CPX(IloModel, IloObjective, IloRangeArray, IloRangeArray, IloRangeArray, IloNumVarArray, IloNumVarArray, int, int, int, int *, int *, int *, int *, int *, int *);
 

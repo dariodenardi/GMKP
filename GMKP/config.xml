@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Config FormatVersion="1">
+	<instances number="1" />
+	<items number="30" />
+	<knapsacks number="3" />
+	<level group="1" /> <!-- group="1" group="2" group="3" group="4" group="5" -->
+	<correlation type="weakly" /> <!-- type="nothing" type="weakly", type="strongly" -->
+	<c_ratio ratio="0.8" />
+	<classes type="low" /> <!-- type="low" type="high" -->
+	<setups type="low" /> <!-- type="low" type="high" -->
+	<item_distribution type="random" /> <!-- type="random" type="one_class_dense" -->
+	<density ratio="0.25" />
+</Config>
