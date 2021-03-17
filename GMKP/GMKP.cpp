@@ -4,17 +4,8 @@
 #include <iostream> // input/output
 #include <fstream> // read files
 
-#include <stdlib.h>
-#include <ctime>
 #include <sstream>
 #include <string>
-#include <list>
-#include <cmath>
-#include "math.h"
-#include <algorithm>
-#include <iomanip>
-#include <stdio.h>
-#include <string.h>
 
 #include <random>
 #include "pugixml.hpp"
@@ -49,9 +40,13 @@ int main() {
 
 	std::cout << "Parameters" << std::endl;
 
+	// timeout
+	int timeout = doc.child("Config").child("timeout").attribute("value").as_int();
+	std::cout << "timeout: " << timeout << std::endl;
+
 	// number of instance
 	int n_instances = doc.child("Config").child("instances").attribute("number").as_int();
-	std::cout << "number of instances to create : " << n_instances << std::endl;
+	std::cout << "number of instances to create: " << n_instances << std::endl;
 
 	// number of items
 	n = doc.child("Config").child("items").attribute("number").as_int();
@@ -130,16 +125,17 @@ int main() {
 
 	// generate istance
 	for (int inst = 0; inst < n_instances; inst++) {
-		char filename[200];
-		strcpy(filename, "instances/randomQMKP_");
+		// create istance file
+		char istanceFilename[200];
+		strcpy(istanceFilename, "instances/randomGMKP_");
 		std::stringstream strs;
-		strs << inst + 1 << ".txt";
+		strs << inst + 1 << ".inc";
 		std::string temp_str = strs.str();
 		const char* char_type = (char*)temp_str.c_str();
-		strcat(filename, char_type);
+		strcat(istanceFilename, char_type);
 
 		std::ofstream output;
-		output.open(filename);
+		output.open(istanceFilename);
 
 		output << "sets" << std::endl;
 
@@ -244,20 +240,6 @@ int main() {
 
 		}
 
-		/*
-		for (int j = 0; j < r; j++) {
-			std::cout << indexes[j] << " ";
-		}
-
-		std::cout << "\n";
-
-		for (int j = 0; j < n; j++) {
-			std::cout << classes[j] << " ";
-		}
-
-		std::cout << "\n";
-		*/
-
 		output << std::endl;
 
 		output << "parameter s(r)" << std::endl;
@@ -275,54 +257,84 @@ int main() {
 
 		}
 
+		// close istance file
 		output.close();
+
+		std::cout << "\nStart to create CPLEX problem number " << inst + 1 << std::endl;
+
+		IloEnv env;
+		IloModel model(env);
+
+		// set problem name
+		model.setName("Generalized Multiple Knapsack Problem");
+
+		// variables (columns)
+		IloNumVarArray x(env);
+		IloNumVarArray y(env);
+
+		// objective function
+		IloObjective obj = IloMaximize(env);
+
+		// constraints (rows)
+		IloRangeArray capacity(env);
+		IloRangeArray max_one_bin(env);
+		IloRangeArray dependent_decision(env);
+
+		// solve problem
+		solveGMKP_CPX(model, obj, capacity, max_one_bin, dependent_decision, x, y, n, m, r, weights, profits, capacities, setups, classes, indexes);
+
+		// add all to the model
+		model.add(obj);
+		model.add(capacity);
+		model.add(max_one_bin);
+		model.add(dependent_decision);
+
+		IloCplex cplex(model);
+
+		// set timeout
+		cplex.setParam(IloCplex::Param::TimeLimit, timeout);
+
+		// export the model into an .lp file
+		char modelFilename[200];
+		strcpy(modelFilename, "models/model_");
+		std::stringstream strs2;
+		strs2 << inst + 1 << ".lp";
+		temp_str = strs2.str();
+		char_type = (char*)temp_str.c_str();
+		strcat(modelFilename, char_type);
+
+		cplex.exportModel(modelFilename);
+
+		// write log
+		char logFilename[200];
+		strcpy(logFilename, "logs/log_");
+		std::stringstream strs3;
+		strs3 << inst + 1 << ".txt";
+		temp_str = strs3.str();
+		char_type = (char*)temp_str.c_str();
+		strcat(logFilename, char_type);
+
+		std::ofstream log;
+		log.open(logFilename);
+
+		cplex.setOut(log);
+
+		// solve the problem
+		if (cplex.solve()) {
+			std::cout << "CPLEX model solved! (Status: " << cplex.getStatus() << ")" << std::endl;
+			std::cout << "The objective value is: " << cplex.getObjValue() << std::endl;
+		}
+		else {
+			std::cerr << "CPLEX failed! (Status: " << cplex.getStatus() << ", " << cplex.getCplexStatus() << ")" << std::endl;
+		}
+
+		// close log file
+		log.close();
+
+		// clean up memory
+		env.end();
+
 	} // istances
-
-	std::cout << "Start to create CPLEX problem" << std::endl;
-
-	IloEnv env;
-	IloModel model(env);
-
-	// set problem name
-	model.setName("Generalized Multiple Knapsack Problem");
-
-	// variables (columns)
-	IloNumVarArray x(env);
-	IloNumVarArray y(env);
-
-	// objective function
-	IloObjective obj = IloMaximize(env);
-
-	// constraints (rows)
-	IloRangeArray capacity(env);
-	IloRangeArray max_one_bin(env);
-	IloRangeArray dependent_decision(env);
-
-	// solve problem
-	solveGMKP_CPX(model, obj, capacity, max_one_bin, dependent_decision, x, y, n, m, r, weights, profits, capacities, setups, classes, indexes);
-
-	// add all to the model
-	model.add(obj);
-	model.add(capacity);
-	model.add(max_one_bin);
-	model.add(dependent_decision);
-
-	IloCplex cplex(model);
-
-	// export the model into an .lp file
-	cplex.exportModel("model.lp");
-
-	// solve the problem
-	if (cplex.solve()) {
-		std::cout << "CPLEX model solved! (Status: " << cplex.getStatus() << ")" << std::endl;
-		std::cout << "The objective value is: " << cplex.getObjValue() << std::endl;
-	}
-	else {
-		std::cerr << "CPLEX failed! (Status: " << cplex.getStatus() << ", " << cplex.getCplexStatus() << ")" << std::endl;
-	}
-
-	// clean up memory
-	env.end();
 
 	// free memory
 	free(profits);
