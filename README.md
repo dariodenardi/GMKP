@@ -2,9 +2,9 @@
 
 ### Requirements
 - Visual Studio
-- ILOG CPLEX Optimization Studio
+- ILOG CPLEX Optimization Studio v12.9
 
-### Configuration Visual Studio
+### Configuration Visual Studio for CPLEX Libraries
 
 Right click on project -- Property
 

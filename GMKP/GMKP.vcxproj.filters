@@ -15,25 +15,31 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GMKP.cpp">
-      <Filter>File di origine</Filter>
+    <ClCompile Include="pugixml.cpp">
+      <Filter>File di risorse</Filter>
     </ClCompile>
     <ClCompile Include="GMKP_CPX.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="pugixml.cpp">
-      <Filter>File di risorse</Filter>
+    <ClCompile Include="GMKP.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="CHECK_CONS.cpp">
+      <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GMKP_CPX.h">
-      <Filter>File di origine</Filter>
-    </ClInclude>
     <ClInclude Include="pugixml.hpp">
       <Filter>File di risorse</Filter>
     </ClInclude>
     <ClInclude Include="pugiconfig.hpp">
       <Filter>File di risorse</Filter>
+    </ClInclude>
+    <ClInclude Include="GMKP_CPX.h">
+      <Filter>File di origine</Filter>
+    </ClInclude>
+    <ClInclude Include="CHECK_CONS.h">
+      <Filter>File di origine</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

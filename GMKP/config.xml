@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Config FormatVersion="1">
-	<timeout value="3600" />
-	<instances number="5" />
-	<items number="50" />
-	<knapsacks number="3" />
+<Config FormatVersion="2">
+	<library name="callable library" /> <!-- name="concert" name="callable library" -->
+	<timeout value="600" />
+	<instances number="1" />
+	<items number="25" />
+	<knapsacks number="2" />
+	
 	<level group="1" /> <!-- group="1" group="2" group="3" group="4" group="5" -->
 	<correlation type="weakly" /> <!-- type="nothing" type="weakly", type="strongly" -->
 	<c_ratio ratio="0.8" />
