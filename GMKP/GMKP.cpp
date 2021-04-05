@@ -11,6 +11,7 @@
 #include "pugixml.hpp"
 
 #include "GMKP_CPX.h"
+//#include "GMKP_CONCERT.h"
 
 using namespace std;
 
@@ -33,7 +34,6 @@ int main(int argc, char **argv) {
 	double time;
 
 	// output data
-	double objval = 0;
 	int status = 0;
 
 	// read configuration
@@ -49,6 +49,10 @@ int main(int argc, char **argv) {
 	}
 
 	std::cout << "Parameters" << std::endl;
+
+	// library
+	std::string library = doc.child("Config").child("library").attribute("name").as_string();
+	std::cout << "library used: " << library << std::endl;
 
 	// timeout
 	int TL = doc.child("Config").child("timeout").attribute("value").as_int();
@@ -201,22 +205,22 @@ int main(int argc, char **argv) {
 		strcat(logFilename, char_type);
 
 		// solve problem
-		status = solveGMKP_CPX(n, m, r, weights, profits, capacities, setups, classes, indexes, &objval, modelFilename, logFilename, TL, false);
+		status = solveGMKP_CPX(n, m, r, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, false);
 
 		// print output
-		if (status) {
+		if (status)
 			std::cout << "An error has occurred! Error number : " << status << std::endl;
-		}
-		else {
+		else
 			std::cout << "The function was performed correctly!" << std::endl;
-			std::cout << "Root UB: " << objval << std::endl;
-		}
+
+		//std::cout << std::endl;
+		//solveGMKP_CONCERT(n, m, r, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, true);
 
 		std::cout << std::endl;
 
 		start = clock();
 		// solve problem
-		status = solveGMKP_CPX(n, m, r, weights, profits, capacities, setups, classes, indexes, &objval, modelFilename, logFilename, TL, true);
+		status = solveGMKP_CPX(n, m, r, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, true);
 		end = clock();
 		time = ((double)(end - start)) / CLOCKS_PER_SEC;
 
@@ -227,7 +231,6 @@ int main(int argc, char **argv) {
 		else {
 			std::cout << "The function was performed correctly!" << std::endl;
 			std::cout << "Elapsed time: " << time << std::endl;
-			std::cout << "cut off: " << objval << std::endl;
 		}
 
 	} // istances

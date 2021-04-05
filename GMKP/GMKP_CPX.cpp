@@ -6,7 +6,7 @@
 #define WRITELP //write lp problem to file
 #define WRITELOG //write log
 
-int solveGMKP_CPX(int n, int m, int r, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes, double *objval, char * modelFilename, char * logFilename, int TL, bool intflag) {
+int solveGMKP_CPX(int n, int m, int r, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes, char * modelFilename, char * logFilename, int TL, bool intflag) {
 
 	/*******************************************/
 	/*     set CPLEX environment and lp        */
@@ -14,6 +14,7 @@ int solveGMKP_CPX(int n, int m, int r, int * weights, int * profits, int * capac
 	CPXENVptr env;
 	CPXLPptr lp;
 	int status;
+	double objval;
 
 	/* open CPLEX environment
 	 * */
@@ -43,7 +44,7 @@ int solveGMKP_CPX(int n, int m, int r, int * weights, int * profits, int * capac
 
 	/* create CPLEX lp
 	 * */
-	lp = CPXcreateprob(env, &status, "GMKP");
+	lp = CPXcreateprob(env, &status, "GMKP - Callable Library");
 	if (status) {
 		std::cout << "error: GMKP CPXcreateprob failed...exiting" << std::endl;
 		exit(1);
@@ -429,7 +430,7 @@ int solveGMKP_CPX(int n, int m, int r, int * weights, int * profits, int * capac
 	/* OBJECTIVE VALUE
 	 * access objective function value
 	 * */
-	status = CPXgetobjval(env, lp, objval);
+	status = CPXgetobjval(env, lp, &objval);
 	if (status) {
 		std::cout << "error: GMKP failed to obtain objective value...exiting" << std::endl;
 		exit(1);
@@ -497,24 +498,24 @@ int solveGMKP_CPX(int n, int m, int r, int * weights, int * profits, int * capac
 			exit(1);
 		}
 
-		status = checkSolution(x, *objval, n, m, r, weights, profits, capacities, setups, classes, indexes);
+		int statusCheck = checkSolution(x, objval, n, m, r, weights, profits, capacities, setups, classes, indexes);
 
-		if (status == 0) {
+		if (statusCheck == 0) {
 			std::cout << "All constraints are ok" << std::endl;
 		}
-		else if (status == 1) {
+		else if (statusCheck == 1) {
 			std::cout << "Constraint violated: weights of the items are greater than the capacity..." << std::endl;
 		}
-		else if (status == 2) {
+		else if (statusCheck == 2) {
 			std::cout << "Constraint violated: item is assigned to more than one knapsack..." << std::endl;
 		}
-		else if (status == 3) {
+		else if (statusCheck == 3) {
 			std::cout << "Constraint violated: class is assigned to more than one knapsack..." << std::endl;
 		}
-		else if (status == 4) {
+		else if (statusCheck == 4) {
 			std::cout << "Constraint violated: items of class are not assigned to knapsack..." << std::endl;
 		}
-		else if (status == 5) {
+		else if (statusCheck == 5) {
 			std::cout << "Optimal solution violeted..." << std::endl;
 		}
 
@@ -528,6 +529,10 @@ int solveGMKP_CPX(int n, int m, int r, int * weights, int * profits, int * capac
 	std::cout << "opt: " << solstat << std::endl;
 	std::cout << "best UB: " << objval_p << std::endl;
 	std::cout << "BB-node: " << nnodes << std::endl;
+	if (intflag == false)
+		std::cout << "Root UB: " << objval << std::endl;
+	else
+		std::cout << "cut off: " << objval << std::endl;
 
 	/*free CPLEX
 	 * */

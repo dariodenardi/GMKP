@@ -27,6 +27,9 @@
     <ClCompile Include="CHECK_CONS.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="GMKP_CONCERT.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pugixml.hpp">
@@ -39,6 +42,9 @@
       <Filter>File di origine</Filter>
     </ClInclude>
     <ClInclude Include="CHECK_CONS.h">
+      <Filter>File di origine</Filter>
+    </ClInclude>
+    <ClInclude Include="GMKP_CONCERT.h">
       <Filter>File di origine</Filter>
     </ClInclude>
   </ItemGroup>

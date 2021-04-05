@@ -2,9 +2,9 @@
 <Config FormatVersion="2">
 	<library name="callable library" /> <!-- name="concert" name="callable library" -->
 	<timeout value="600" />
-	<instances number="1" />
-	<items number="25" />
-	<knapsacks number="2" />
+	<instances number="10" />
+	<items number="200" />
+	<knapsacks number="4" />
 	
 	<level group="1" /> <!-- group="1" group="2" group="3" group="4" group="5" -->
 	<correlation type="weakly" /> <!-- type="nothing" type="weakly", type="strongly" -->
