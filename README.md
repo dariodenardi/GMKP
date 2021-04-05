@@ -1,7 +1,7 @@
 # GMKP
 
 ### Requirements
-- Visual Studio
+- IDE C++ (e.g. Visual Studio)
 - ILOG CPLEX Optimization Studio v12.9
 
 ### Configuration Visual Studio for CPLEX Libraries
