@@ -483,6 +483,18 @@ int solveGMKP_CPX(int n, int m, int r, int * weights, int * profits, int * capac
 	 * */
 	int nnodes = CPXgetnodecnt(env, lp);
 
+	/*******************************************/
+	/*  write output                           */
+	/*******************************************/
+
+	if (intflag == false)
+		std::cout << "Root UB: " << objval << std::endl;
+	std::cout << "best UB: " << objval_p << std::endl;
+	if (intflag == true)
+		std::cout << "cut off: " << objval << std::endl;
+	std::cout << "opt: " << solstat << std::endl;
+	std::cout << "BB-node: " << nnodes << std::endl;
+
 	/*
 	* GET VECTOR X
 	* access the vector x to find solution
@@ -522,18 +534,6 @@ int solveGMKP_CPX(int n, int m, int r, int * weights, int * profits, int * capac
 		delete[] x;
 	}
 
-	/*******************************************/
-	/*  write output                           */
-	/*******************************************/
-
-	std::cout << "opt: " << solstat << std::endl;
-	std::cout << "best UB: " << objval_p << std::endl;
-	std::cout << "BB-node: " << nnodes << std::endl;
-	if (intflag == false)
-		std::cout << "Root UB: " << objval << std::endl;
-	else
-		std::cout << "cut off: " << objval << std::endl;
-
 	/*free CPLEX
 	 * */
 	CPXfreeprob(env, &lp);
@@ -541,6 +541,5 @@ int solveGMKP_CPX(int n, int m, int r, int * weights, int * profits, int * capac
 	CPXcloseCPLEX(&env);
 
 	return status;
-
 }
 

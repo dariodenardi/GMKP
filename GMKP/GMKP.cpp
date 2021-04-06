@@ -11,7 +11,7 @@
 #include "pugixml.hpp"
 
 #include "GMKP_CPX.h"
-//#include "GMKP_CONCERT.h"
+#include "GMKP_CONCERT.h"
 
 using namespace std;
 
@@ -205,7 +205,10 @@ int main(int argc, char **argv) {
 		strcat(logFilename, char_type);
 
 		// solve problem
-		status = solveGMKP_CPX(n, m, r, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, false);
+		if (library._Equal("callable library"))
+			status = solveGMKP_CPX(n, m, r, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, false);
+		else
+			status = solveGMKP_CONCERT(n, m, r, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, false);
 
 		// print output
 		if (status)
@@ -214,13 +217,16 @@ int main(int argc, char **argv) {
 			std::cout << "The function was performed correctly!" << std::endl;
 
 		//std::cout << std::endl;
-		//solveGMKP_CONCERT(n, m, r, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, true);
+		//status = solveGMKP_CONCERT(n, m, r, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, false);
 
 		std::cout << std::endl;
 
 		start = clock();
 		// solve problem
-		status = solveGMKP_CPX(n, m, r, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, true);
+		if (library._Equal("callable library"))
+			status = solveGMKP_CPX(n, m, r, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, true);
+		else
+			status = solveGMKP_CONCERT(n, m, r, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, true);
 		end = clock();
 		time = ((double)(end - start)) / CLOCKS_PER_SEC;
 
@@ -232,6 +238,10 @@ int main(int argc, char **argv) {
 			std::cout << "The function was performed correctly!" << std::endl;
 			std::cout << "Elapsed time: " << time << std::endl;
 		}
+
+		//std::cout << std::endl;
+		//status = solveGMKP_CONCERT(n, m, r, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, true);
+
 
 	} // istances
 

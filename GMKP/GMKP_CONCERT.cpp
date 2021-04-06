@@ -3,10 +3,12 @@
 void add_rows(IloModel model, IloRangeArray capacity, IloRangeArray max_one_bin, IloRangeArray dependent_decision, IloNumVarArray y, int m, int n, int r, int * capacities, bool intflag);
 void add_columns(IloModel model, IloObjective obj, IloRangeArray capacity, IloRangeArray max_one_bin, IloRangeArray dependent_decision, IloNumVarArray x, IloNumVarArray y, int n, int m, int r, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes, bool intflag);
 
-void solveGMKP_CONCERT(int n, int m, int r, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes, char * modelFilename, char * logFilename, int TL, bool intflag) {
+int solveGMKP_CONCERT(int n, int m, int r, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes, char * modelFilename, char * logFilename, int TL, bool intflag) {
 
 	IloEnv env;
 	IloModel model(env);
+
+	int status;
 
 	// set problem name
 	model.setName("GMKP - Concert Technologies");
@@ -45,23 +47,31 @@ void solveGMKP_CONCERT(int n, int m, int r, int * weights, int * profits, int * 
 	log.open(logFilename);
 
 	cplex.setOut(log);
-
+	
 	// solve the problem
 	if (cplex.solve()) {
-		std::cout << "CPLEX model solved! (Status: " << cplex.getStatus() << ")" << std::endl;
 		if (intflag == false)
 			std::cout << "Root UB: " << cplex.getObjValue() << std::endl;
-		else
+		std::cout << "best UB: " << cplex.getBestObjValue() << std::endl;
+		if (intflag == true)
 			std::cout << "cut off: " << cplex.getObjValue() << std::endl;
-		std::cout << "The best objective value is: " << cplex.getBestObjValue() << std::endl;
+		std::cout << "opt: " << cplex.getStatus() << std::endl;
+		status = 0;
 	}
-	else {
-		std::cerr << "CPLEX failed! (Status: " << cplex.getStatus() << ", " << cplex.getCplexStatus() << ")" << std::endl;
-	}
+	else
+		status = cplex.getStatus();
 
 	// check constraints
-	/*if (intflag) {
-		int statusCheck = checkSolution(x, objval, n, m, r, weights, profits, capacities, setups, classes, indexes);
+	if (intflag) {
+
+		double *vectorX;
+		vectorX = new double[n*m + m * r];
+		for (IloInt i = 0; i < n*m; i++)
+			vectorX[i] = cplex.getValue(x[i]);
+		for (IloInt i = 0; i < r*m; i++)
+			vectorX[n*m + i] = cplex.getValue(y[i]);
+
+		int statusCheck = checkSolution(vectorX, cplex.getObjValue(), n, m, r, weights, profits, capacities, setups, classes, indexes);
 
 		if (statusCheck == 0) {
 			std::cout << "All constraints are ok" << std::endl;
@@ -82,13 +92,16 @@ void solveGMKP_CONCERT(int n, int m, int r, int * weights, int * profits, int * 
 			std::cout << "Optimal solution violeted..." << std::endl;
 		}
 
-	}*/
+		delete[] vectorX;
+	}
 
 	// close log file
 	log.close();
 
 	// clean up memory
 	env.end();
+
+	return status;
 }
 
 void add_rows(IloModel model, IloRangeArray capacity, IloRangeArray max_one_bin, IloRangeArray dependent_decision, IloNumVarArray y, int m, int n, int r, int * capacities, bool intflag) {
