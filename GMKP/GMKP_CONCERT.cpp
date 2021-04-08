@@ -73,7 +73,7 @@ int solveGMKP_CONCERT(int n, int m, int r, int b, int * weights, int * profits, 
 		for (IloInt i = 0; i < r*m; i++)
 			vectorX[n*m + i] = cplex.getValue(y[i]);
 
-		int statusCheck = checkSolution(vectorX, cplex.getObjValue(), n, m, r, weights, profits, capacities, setups, classes, indexes);
+		int statusCheck = checkSolution(vectorX, cplex.getObjValue(), n, m, r, b, weights, profits, capacities, setups, classes, indexes);
 
 		if (statusCheck == 0) {
 			std::cout << "All constraints are ok" << std::endl;
@@ -89,9 +89,6 @@ int solveGMKP_CONCERT(int n, int m, int r, int b, int * weights, int * profits, 
 		}
 		else if (statusCheck == 4) {
 			std::cout << "Constraint violated: items of class are not assigned to knapsack..." << std::endl;
-		}
-		else if (statusCheck == 5) {
-			std::cout << "Optimal solution violeted..." << std::endl;
 		}
 
 		delete[] vectorX;

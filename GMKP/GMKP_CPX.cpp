@@ -571,7 +571,7 @@ int solveGMKP_CPX(int n, int m, int r, int b, int * weights, int * profits, int 
 			exit(1);
 		}
 
-		int statusCheck = checkSolution(x, objval, n, m, r, weights, profits, capacities, setups, classes, indexes);
+		int statusCheck = checkSolution(x, objval, n, m, r, b, weights, profits, capacities, setups, classes, indexes);
 
 		if (statusCheck == 0) {
 			std::cout << "All constraints are ok" << std::endl;
@@ -587,9 +587,6 @@ int solveGMKP_CPX(int n, int m, int r, int b, int * weights, int * profits, int 
 		}
 		else if (statusCheck == 4) {
 			std::cout << "Constraint violated: items of class are not assigned to knapsack..." << std::endl;
-		}
-		else if (statusCheck == 5) {
-			std::cout << "Optimal solution violeted..." << std::endl;
 		}
 
 		delete[] x;

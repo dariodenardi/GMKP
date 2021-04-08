@@ -2,7 +2,7 @@
 <Config FormatVersion="2">
 	<library name="callable library" /> <!-- name="concert" name="callable library" -->
 	<timeout value="600" />
-	<instances number="10" />
+	<instances number="1" />
 	<items number="25" />
 	<knapsacks number="2" />
 </Config>

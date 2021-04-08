@@ -1,8 +1,8 @@
 #include "CHECK_CONS.h"
 
-int checkSolution(double *x, double objval, int n, int m, int r, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes) {
+int checkSolution(double *x, double objval, int n, int m, int r, int b, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes) {
 
-	double objval_check = 0;
+	//double objval_check = 0;
 	int sum;
 	// check constraint 1
 	for (int i = 0; i < m; i++) {
@@ -12,7 +12,7 @@ int checkSolution(double *x, double objval, int n, int m, int r, int * weights, 
 		for (int j = 0; j < n; j++) {
 			sum += x[i*n + j] * weights[j];
 			//std::cout << "WEIGHT" << j + 1 << " " << x[i*n + j] << " " << weights[j] << std::endl;
-			objval_check += x[i*n + j] * profits[i*n + j];
+			//objval_check += x[i*n + j] * profits[i*n + j];
 		}
 
 		for (int k = 0; k < r; k++) {
@@ -53,7 +53,7 @@ int checkSolution(double *x, double objval, int n, int m, int r, int * weights, 
 
 		//std::cout << "BIN" << k + 1 << " " << sum << std::endl;
 
-		if (sum > 1)
+		if (sum > b)
 			return 3;
 	}
 
@@ -86,8 +86,8 @@ int checkSolution(double *x, double objval, int n, int m, int r, int * weights, 
 	// check optimal value
 	//std::cout << "RESULTS " << objval_check << " " << objval << std::endl;
 
-	if (objval_check != objval)
-		return 5;
+	//if (objval_check != objval)
+	//	return 5;
 
 	// if solution is ok
 	return 0;

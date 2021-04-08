@@ -1,4 +1,10 @@
-﻿  GMKP.cpp
+﻿  CHECK_CONS.cpp
+c:\users\dario\source\repos\gmkp\gmkp\check_cons.cpp(13): warning C4244: '+=': conversione da 'double' a 'int'. Possibile perdita di dati.
+c:\users\dario\source\repos\gmkp\gmkp\check_cons.cpp(19): warning C4244: '+=': conversione da 'double' a 'int'. Possibile perdita di dati.
+c:\users\dario\source\repos\gmkp\gmkp\check_cons.cpp(35): warning C4244: '+=': conversione da 'double' a 'int'. Possibile perdita di dati.
+c:\users\dario\source\repos\gmkp\gmkp\check_cons.cpp(51): warning C4244: '+=': conversione da 'double' a 'int'. Possibile perdita di dati.
+c:\users\dario\source\repos\gmkp\gmkp\check_cons.cpp(72): warning C4244: '+=': conversione da 'double' a 'int'. Possibile perdita di dati.
   GMKP_CONCERT.cpp
+  GMKP_CPX.cpp
   Generazione del codice in corso...
   GMKP.vcxproj -> C:\Users\dario\source\repos\GMKP\x64\Debug\GMKP.exe
