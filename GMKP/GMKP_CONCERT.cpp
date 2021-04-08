@@ -1,9 +1,9 @@
 #include "GMKP_CONCERT.h"
 
-void add_rows(IloModel model, IloRangeArray capacity, IloRangeArray max_one_bin, IloRangeArray dependent_decision, IloNumVarArray y, int m, int n, int r, int * capacities, bool intflag);
-void add_columns(IloModel model, IloObjective obj, IloRangeArray capacity, IloRangeArray max_one_bin, IloRangeArray dependent_decision, IloNumVarArray x, IloNumVarArray y, int n, int m, int r, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes, bool intflag);
+void add_rows(IloModel model, IloRangeArray capacity, IloRangeArray max_one_bin_x, IloRangeArray max_bk_bin_y, IloRangeArray dependent_decision, IloNumVarArray y, int m, int n, int r, int b, int * capacities, bool intflag);
+void add_columns(IloModel model, IloObjective obj, IloRangeArray capacity, IloRangeArray max_one_bin_x, IloRangeArray max_bk_bin_y, IloRangeArray dependent_decision, IloNumVarArray x, IloNumVarArray y, int n, int m, int r, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes, bool intflag);
 
-int solveGMKP_CONCERT(int n, int m, int r, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes, char * modelFilename, char * logFilename, int TL, bool intflag) {
+int solveGMKP_CONCERT(int n, int m, int r, int b, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes, char * modelFilename, char * logFilename, int TL, bool intflag) {
 
 	IloEnv env;
 	IloModel model(env);
@@ -22,16 +22,18 @@ int solveGMKP_CONCERT(int n, int m, int r, int * weights, int * profits, int * c
 
 	// constraints (rows)
 	IloRangeArray capacity(env);
-	IloRangeArray max_one_bin(env);
+	IloRangeArray max_one_bin_x(env);
+	IloRangeArray max_bk_bin_y(env);
 	IloRangeArray dependent_decision(env);
 
-	add_rows(model, capacity, max_one_bin, dependent_decision, y, m, n, r, capacities, intflag);
-	add_columns(model, obj, capacity, max_one_bin, dependent_decision, x, y, n, m, r, weights, profits, capacities, setups, classes, indexes, intflag);
+	add_rows(model, capacity, max_one_bin_x, max_bk_bin_y, dependent_decision, y, m, n, r, b, capacities, intflag);
+	add_columns(model, obj, capacity, max_one_bin_x, max_bk_bin_y, dependent_decision, x, y, n, m, r, weights, profits, capacities, setups, classes, indexes, intflag);
 
 	// add all to the model
 	model.add(obj);
 	model.add(capacity);
-	model.add(max_one_bin);
+	model.add(max_one_bin_x);
+	model.add(max_bk_bin_y);
 	model.add(dependent_decision);
 
 	IloCplex cplex(model);
@@ -104,38 +106,46 @@ int solveGMKP_CONCERT(int n, int m, int r, int * weights, int * profits, int * c
 	return status;
 }
 
-void add_rows(IloModel model, IloRangeArray capacity, IloRangeArray max_one_bin, IloRangeArray dependent_decision, IloNumVarArray y, int m, int n, int r, int * capacities, bool intflag) {
+void add_rows(IloModel model, IloRangeArray capacity, IloRangeArray max_one_bin_x, IloRangeArray max_bk_bin_y, IloRangeArray dependent_decision, IloNumVarArray y, int m, int n, int r, int b, int * capacities, bool intflag) {
 	IloEnv env = model.getEnv();
+	std::stringstream name;
 
 	for (int i = 0; i < m; i++) {
-		std::stringstream name;
 		// add constraint (1):
 		// sum(j = 1 ... n) w_j * x_ij + sum(k = 1 ... r) s_k * y_ik <= C_i   for all i = 1 .. m
+		name.str(std::string());
 		name << "capacity_" << i + 1;
 		capacity.add(IloRange(env, -IloInfinity, capacities[i], name.str().c_str())); // <= C_i
 
+		// add constraint (4):
+		// sum(j belongs Rk) x_ij <= n * y_ik       for all k = 1 .. r
+		// sum(j belongs Rk) x_ij - n * y_ik <= 0   for all k = 1 .. r
 		for (int k = 0; k < r; k++) {
-
-			// add constraint (3):
-			// sum(i = 1 ... m) y_ik <= 1       for all k = 1 .. r
-			// only one cycle
-			if (i == 0) {
-				name.str(std::string());
-				name << "max_one_bin_" << k + 1;
-				max_one_bin.add(IloRange(env, -IloInfinity, 1.0, name.str().c_str())); // <= 1
-			}
-
-			// add constraint (4):
-			// sum(j belongs Rk) x_ij <= n * y_ik       for all k = 1 .. r
-			// sum(j belongs Rk) x_ij - n * y_ik <= 0   for all k = 1 .. r
 			name.str(std::string());
 			name << "dependent_decision_" << i * r + k + 1;
 			dependent_decision.add(IloRange(env, -IloInfinity, 0, name.str().c_str())); // <= 0
 		} // k (classes)
 	} // i (knapsacks)
+
+	// add constraint (2):
+	// sum(i = 1 ... m) x_ij <= 1       for all j = 1 .. n
+	for (int j = 0; j < n; j++) {
+		name.str(std::string());
+		name << "max_one_bin_x_" << j + 1;
+		max_one_bin_x.add(IloRange(env, -IloInfinity, 1.0, name.str().c_str())); // <= 1
+	} // j (items)
+
+	// add constraint (3):
+	// sum(i = 1 ... m) y_ik <= 1       for all k = 1 .. r
+	for (int k = 0; k < r; k++) {
+		name.str(std::string());
+		name << "max_bk_bin_y_" << k + 1;
+		max_bk_bin_y.add(IloRange(env, -IloInfinity, b, name.str().c_str())); // <= 1
+	} // k (classes)
+
 }
 
-void add_columns(IloModel model, IloObjective obj, IloRangeArray capacity, IloRangeArray max_one_bin, IloRangeArray dependent_decision, IloNumVarArray x, IloNumVarArray y, int n, int m, int r, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes, bool intflag) {
+void add_columns(IloModel model, IloObjective obj, IloRangeArray capacity, IloRangeArray max_one_bin_x, IloRangeArray max_bk_bin_y, IloRangeArray dependent_decision, IloNumVarArray x, IloNumVarArray y, int n, int m, int r, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes, bool intflag) {
 	IloEnv env = model.getEnv();
 
 	for (int i = 0; i < m; i++) {
@@ -146,6 +156,11 @@ void add_columns(IloModel model, IloObjective obj, IloRangeArray capacity, IloRa
 			// constraint (1):
 			// sum(j = 1 ... n) w_j * x_ij + sum(k = 1 ... r) s_k * y_ik <= C_i   for all i = 1 .. m
 			column_x += capacity[i](weights[j]); // sum(j = 1 ... n) w_j * x_ij
+
+			// add constraint (2):
+			// sum(i = 1 ... m) x_ij <= 1       for all j = 1 .. n
+			column_x += max_one_bin_x[j](1.0);
+
 
 			// constraint (4):
 			// sum(j belongs Rk) x_ij <= n * y_ik       for all k = 1 .. r
@@ -196,7 +211,7 @@ void add_columns(IloModel model, IloObjective obj, IloRangeArray capacity, IloRa
 
 			// constraint (3):
 			// sum(i = 1 ... m) y_ik <= 1       for all k = 1 .. r
-			column_y += max_one_bin[k](1.0); // sum(i = 1 ... m) y_ik
+			column_y += max_bk_bin_y[k](1.0); // sum(i = 1 ... m) y_ik
 
 			// create the proper variable for CPLEX, corresponding to y_ik:
 			// y_ik is binary, therefore its LB is 0 and its UB is 1

@@ -6,7 +6,7 @@
 #define WRITELP //write lp problem to file
 #define WRITELOG //write log
 
-int solveGMKP_CPX(int n, int m, int r, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes, char * modelFilename, char * logFilename, int TL, bool intflag) {
+int solveGMKP_CPX(int n, int m, int r, int b, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes, char * modelFilename, char * logFilename, int TL, bool intflag) {
 
 	/*******************************************/
 	/*     set CPLEX environment and lp        */
@@ -228,6 +228,67 @@ int solveGMKP_CPX(int n, int m, int r, int * weights, int * profits, int * capac
 	delete cnames;
 #endif
 
+	/*	constraint (2):
+		sum(i = 1 ... m) x_ij <= 1       for all j = 1 .. n
+	 * */
+
+	rcnt = n; // number of constraints (rows)
+	nzcnt = m * n; // number of total variables (columns)
+
+	// allocate memory for constraint
+	rmatbeg = new int[rcnt];
+	rhs = new double[rcnt];
+	sense = new char[rcnt];
+	rmatind = new int[nzcnt];
+	rmatval = new double[nzcnt];
+
+#ifdef CONSNAMES
+	cnames = new char*[rcnt];
+	for (int i = 0; i < rcnt; i++)
+		cnames[i] = new char[100];
+#endif
+
+	// init counter
+	cc = 0;
+	// fill in rows for multiple knapsack constraints
+	for (int j = 0; j < rcnt; j++)
+	{
+		rmatbeg[j] = cc; // starting index of the n-th constraint
+		sense[j] = 'L';
+		rhs[j] = 1.0;
+
+		for (int i = 0; i < m; i++)
+		{
+			rmatind[cc] = i * n + j; // variable number
+			rmatval[cc] = 1.0;
+			cc++;
+		}
+
+#ifdef CONSNAMES
+		sprintf(cnames[j], "max_one_bin_x_%d", j + 1);
+#endif
+	}
+
+	/* add rows for multiple knapsack constraints
+	 * */
+	status = CPXaddrows(env, lp, 0, rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, NULL, cnames);
+	if (status) {
+		std::cout << "error: GMKP CPXaddrows (2-nd constraint) failed...exiting" << std::endl;
+		exit(1);
+	}
+
+	// free rows stuff
+	delete[] rmatbeg;
+	delete[] sense;
+	delete[] rhs;
+	delete[] rmatind;
+	delete[] rmatval;
+#ifdef CONSNAMES
+	for (int i = 0; i < rcnt; i++)
+		delete[] cnames[i];
+	delete cnames;
+#endif
+
 	/*	constraint (3):
 		sum(i = 1 ... m) y_ik <= 1       for all k = 1 .. r
 	 * */
@@ -255,7 +316,7 @@ int solveGMKP_CPX(int n, int m, int r, int * weights, int * profits, int * capac
 	{
 		rmatbeg[k] = cc; // starting index of the n-th constraint
 		sense[k] = 'L';
-		rhs[k] = 1.0;
+		rhs[k] = b;
 
 		for (int i = 0; i < m; i++)
 		{
@@ -265,7 +326,7 @@ int solveGMKP_CPX(int n, int m, int r, int * weights, int * profits, int * capac
 		}
 
 #ifdef CONSNAMES
-		sprintf(cnames[k], "max_one_bin_%d", k + 1);
+		sprintf(cnames[k], "max_bk_bin_y_%d", k + 1);
 #endif
 	}
 
@@ -542,4 +603,3 @@ int solveGMKP_CPX(int n, int m, int r, int * weights, int * profits, int * capac
 
 	return status;
 }
-

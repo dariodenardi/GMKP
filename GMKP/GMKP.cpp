@@ -181,6 +181,13 @@ int main(int argc, char **argv) {
 			output << i + 1 << "\t" << setups[i] << std::endl;
 		}
 
+		output << std::endl;
+
+		output << "parameter b(k)" << std::endl;
+		std::uniform_int_distribution<int> b_distr(1, m);
+		int b = b_distr(generator);
+		output << b << std::endl;
+
 		// close istance file
 		output.close();
 
@@ -206,9 +213,9 @@ int main(int argc, char **argv) {
 
 		// solve problem
 		if (library._Equal("callable library"))
-			status = solveGMKP_CPX(n, m, r, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, false);
+			status = solveGMKP_CPX(n, m, r, b, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, false);
 		else
-			status = solveGMKP_CONCERT(n, m, r, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, false);
+			status = solveGMKP_CONCERT(n, m, r, b, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, false);
 
 		// print output
 		if (status)
@@ -217,16 +224,16 @@ int main(int argc, char **argv) {
 			std::cout << "The function was performed correctly!" << std::endl;
 
 		//std::cout << std::endl;
-		//status = solveGMKP_CONCERT(n, m, r, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, false);
+		//status = solveGMKP_CONCERT(n, m, r, b, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, false);
 
 		std::cout << std::endl;
 
 		start = clock();
 		// solve problem
 		if (library._Equal("callable library"))
-			status = solveGMKP_CPX(n, m, r, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, true);
+			status = solveGMKP_CPX(n, m, r, b, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, true);
 		else
-			status = solveGMKP_CONCERT(n, m, r, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, true);
+			status = solveGMKP_CONCERT(n, m, r, b, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, true);
 		end = clock();
 		time = ((double)(end - start)) / CLOCKS_PER_SEC;
 
@@ -240,7 +247,7 @@ int main(int argc, char **argv) {
 		}
 
 		//std::cout << std::endl;
-		//status = solveGMKP_CONCERT(n, m, r, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, true);
+		//status = solveGMKP_CONCERT(n, m, r, b, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, true);
 
 
 	} // istances

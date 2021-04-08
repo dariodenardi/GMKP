@@ -2,15 +2,7 @@
 <Config FormatVersion="2">
 	<library name="callable library" /> <!-- name="concert" name="callable library" -->
 	<timeout value="600" />
-	<instances number="1" />
+	<instances number="10" />
 	<items number="25" />
 	<knapsacks number="2" />
-	
-	<level group="1" /> <!-- group="1" group="2" group="3" group="4" group="5" -->
-	<correlation type="weakly" /> <!-- type="nothing" type="weakly", type="strongly" -->
-	<c_ratio ratio="0.8" />
-	<classes type="low" /> <!-- type="low" type="high" -->
-	<setups type="low" /> <!-- type="low" type="high" -->
-	<item_distribution type="random" /> <!-- type="random" type="one_class_dense" -->
-	<density ratio="0.25" />
 </Config>

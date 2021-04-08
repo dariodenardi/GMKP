@@ -10,6 +10,6 @@
 
 #include "CHECK_CONS.h"
 
-int solveGMKP_CONCERT(int n, int m, int r, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes, char * modelFilename, char * logFilename, int TL, bool intflag);
+int solveGMKP_CONCERT(int n, int m, int r, int b, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes, char * modelFilename, char * logFilename, int TL, bool intflag);
 
 #endif /* GMKP_CONCERT_H_ */
