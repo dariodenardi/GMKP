@@ -1,6 +1,6 @@
 #include "CHECK_CONS.h"
 
-int checkSolution(double *x, double objval, int n, int m, int r, int b, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes) {
+int checkSolution(double *x, double objval, int n, int m, int r, int * b, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes) {
 
 	//double objval_check = 0;
 	int sum;
@@ -22,7 +22,7 @@ int checkSolution(double *x, double objval, int n, int m, int r, int b, int * we
 
 		//std::cout << "SUM " << sum << std::endl;
 
-		if (sum > capacities[0])
+		if (sum > capacities[i])
 			return 1;
 	}
 
@@ -53,7 +53,7 @@ int checkSolution(double *x, double objval, int n, int m, int r, int b, int * we
 
 		//std::cout << "BIN" << k + 1 << " " << sum << std::endl;
 
-		if (sum > b)
+		if (sum > b[k])
 			return 3;
 	}
 

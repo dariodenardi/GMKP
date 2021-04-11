@@ -23,6 +23,7 @@ int main(int argc, char **argv) {
 	int n; // number of objects
 	int m; // number of knapsacks
 	int r; // number of subsets
+	int *b; // item can be assign at most to bk knapsacks
 	int *profits; // array for linear profit term
 	int *weights; // array of weights
 	int *capacities; // array of knapsack capacities
@@ -76,6 +77,7 @@ int main(int argc, char **argv) {
 	// number of classes
 	r = n / 5;
 
+	b = (int *)malloc(sizeof(int) * r);
 	setups = (int *)malloc(sizeof(int) * r);
 	classes = (int *)malloc(sizeof(int) * n);
 	indexes = (int *)malloc(sizeof(int) * r);
@@ -84,10 +86,18 @@ int main(int argc, char **argv) {
 	std::random_device rand_dev;
 	std::mt19937 generator(rand_dev());
 
+	char istanceFilename[200];
+	char modelFilename[200];
+	char logFilename[200];
+
+	int sum_weights;
+	int * capacities_i;
+	int sum_capacities_i;
+	int class_gen;
+
 	// generate istance
 	for (int inst = 0; inst < n_instances; inst++) {
 		// create istance file
-		char istanceFilename[200];
 		strcpy(istanceFilename, "instances/randomGMKP_");
 		std::stringstream strs;
 		strs << inst + 1 << ".inc";
@@ -110,44 +120,56 @@ int main(int argc, char **argv) {
 		output << "\tr classes\t" << r << std::endl;
 
 		output << "parameter w(j)" << std::endl;
-		int sum_weights = 0;
 		std::uniform_int_distribution<int> w_distr(10, 100);
+		sum_weights = 0;
 		for (int i = 0; i < n; i++) {
-
 			// generate weights
 			weights[i] = w_distr(generator);
 			output << i + 1 << "\t" << weights[i] << "\n";
 
 			sum_weights += weights[i];
-
 		}
 
 		output << std::endl;
 
-		output << "parameter cap(k)" << std::endl;
+		output << "parameter cap(i)" << std::endl;
 		// generate capacities
-		double capacities_i = 0;
+		capacities_i = (int *)malloc(sizeof(int) * (m-1));
 		for (int i = 1; i < m; i++) {
-			std::uniform_real_distribution<double> c_distr(0, 0.5*sum_weights - capacities_i);
+			sum_capacities_i = 0;
 
-			capacities_i += c_distr(generator);
+			for (int i2 = 0; i2 < i - 1; i2++) {
+				sum_capacities_i += capacities_i[i2];
+			}
+
+			std::uniform_int_distribution<int> c_distr(0, (int)((0.5*sum_weights) - sum_capacities_i));
+			
+			capacities_i[i - 1] = c_distr(generator);
 		}
 
 		for (int i = 0; i < m; i++) {
-			capacities[i] = (int)((0.5 * sum_weights) - capacities_i);
+			sum_capacities_i = 0;
+
+			for (int i2 = 1; i2 < i + 1; i2++) {
+				sum_capacities_i += capacities_i[i2 - 1];
+			}
+
+			capacities[i] = (0.5 * sum_weights) - sum_capacities_i;
+
+			output << i + 1 << "\t" << capacities[i] << std::endl;
 		}
-		output << "cap(k)=" << capacities[0] << std::endl;
+		free(capacities_i);
 
 		output << std::endl;
 
 		output << "parameter p(i, j)" << std::endl;
+		std::uniform_int_distribution<int> p_distr(10, 100);
 		for (int i = 0; i < n*m; i++) {
 
 			// generate profits
-			std::uniform_int_distribution<int> p_distr(10, 100);
 			profits[i] = p_distr(generator);
 
-			output << i + 1 << "\t" << profits[i] << std::endl;
+			output << (int)(i % n) + 1 << "\t" << (int)(i / n) + 1 << "\t" << profits[i] << std::endl;
 		}
 
 		output << std::endl;
@@ -159,14 +181,12 @@ int main(int argc, char **argv) {
 			if (i < r) {
 				classes[i] = i;
 				indexes[i] = i + 1;
-				output << i + 1 << "." << i + 1 << "=1" << std::endl;
+				output << i + 1 << "\t" << i + 1 << std::endl;
 			}
 			else {
-
-				int class_gen = trj_distr(generator);
+				class_gen = trj_distr(generator);
 				addItemInClass(r, n, class_gen, i, indexes, classes);
-				output << class_gen << "." << i + 1 << "=1" << std::endl;
-
+				output << i + 1 << "\t" << class_gen << std::endl;
 			}
 
 		}
@@ -174,9 +194,9 @@ int main(int argc, char **argv) {
 		output << std::endl;
 
 		output << "parameter s(r)" << std::endl;
+		std::uniform_int_distribution<int> s_distr(50, 100);
 		for (int i = 0; i < r; i++) {
 
-			std::uniform_int_distribution<int> s_distr(50, 100);
 			setups[i] = s_distr(generator);
 			output << i + 1 << "\t" << setups[i] << std::endl;
 		}
@@ -185,8 +205,11 @@ int main(int argc, char **argv) {
 
 		output << "parameter b(k)" << std::endl;
 		std::uniform_int_distribution<int> b_distr(1, m);
-		int b = b_distr(generator);
-		output << b << std::endl;
+		for (int i = 0; i < r; i++) {
+
+			b[i] = b_distr(generator);
+			output << i + 1 << "\t" << b[i] << std::endl;
+		}
 
 		// close istance file
 		output.close();
@@ -194,7 +217,6 @@ int main(int argc, char **argv) {
 		std::cout << "\nStart to create CPLEX problem number " << inst + 1 << std::endl;
 
 		// model into a .lp file
-		char modelFilename[200];
 		strcpy(modelFilename, "models/model_");
 		std::stringstream strs2;
 		strs2 << inst + 1 << ".lp";
@@ -203,7 +225,6 @@ int main(int argc, char **argv) {
 		strcat(modelFilename, char_type);
 
 		// log into a .txt file
-		char logFilename[200];
 		strcpy(logFilename, "logs/log_");
 		std::stringstream strs3;
 		strs3 << inst + 1 << ".txt";
@@ -253,6 +274,7 @@ int main(int argc, char **argv) {
 	} // istances
 
 	// free memory
+	free(b);
 	free(profits);
 	free(weights);
 	free(capacities);

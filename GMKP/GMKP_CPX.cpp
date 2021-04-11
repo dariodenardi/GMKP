@@ -6,7 +6,7 @@
 #define WRITELP //write lp problem to file
 #define WRITELOG //write log
 
-int solveGMKP_CPX(int n, int m, int r, int b, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes, char * modelFilename, char * logFilename, int TL, bool intflag) {
+int solveGMKP_CPX(int n, int m, int r, int * b, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes, char * modelFilename, char * logFilename, int TL, bool intflag) {
 
 	/*******************************************/
 	/*     set CPLEX environment and lp        */
@@ -316,7 +316,7 @@ int solveGMKP_CPX(int n, int m, int r, int b, int * weights, int * profits, int 
 	{
 		rmatbeg[k] = cc; // starting index of the n-th constraint
 		sense[k] = 'L';
-		rhs[k] = b;
+		rhs[k] = b[k];
 
 		for (int i = 0; i < m; i++)
 		{
@@ -326,7 +326,7 @@ int solveGMKP_CPX(int n, int m, int r, int b, int * weights, int * profits, int 
 		}
 
 #ifdef CONSNAMES
-		sprintf(cnames[k], "max_bk_bin_y_%d", k + 1);
+		sprintf(cnames[k], "max_b_bin_y_%d", k + 1);
 #endif
 	}
 
@@ -334,7 +334,7 @@ int solveGMKP_CPX(int n, int m, int r, int b, int * weights, int * profits, int 
 	 * */
 	status = CPXaddrows(env, lp, 0, rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, NULL, cnames);
 	if (status) {
-		std::cout << "error: GMKP CPXaddrows (2-nd constraint) failed...exiting" << std::endl;
+		std::cout << "error: GMKP CPXaddrows (3-rd constraint) failed...exiting" << std::endl;
 		exit(1);
 	}
 
@@ -411,7 +411,7 @@ int solveGMKP_CPX(int n, int m, int r, int b, int * weights, int * profits, int 
 	 * */
 	status = CPXaddrows(env, lp, 0, rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, NULL, cnames);
 	if (status) {
-		std::cout << "error: GMKP CPXaddrows (3-rd constraint) failed...exiting" << std::endl;
+		std::cout << "error: GMKP CPXaddrows (4-th constraint) failed...exiting" << std::endl;
 		exit(1);
 	}
 
@@ -587,6 +587,9 @@ int solveGMKP_CPX(int n, int m, int r, int b, int * weights, int * profits, int 
 		}
 		else if (statusCheck == 4) {
 			std::cout << "Constraint violated: items of class are not assigned to knapsack..." << std::endl;
+		}
+		else if (statusCheck == 5) {
+			std::cout << "Optimal solution violeted..." << std::endl;
 		}
 
 		delete[] x;
