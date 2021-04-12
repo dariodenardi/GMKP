@@ -158,12 +158,14 @@
     <ClCompile Include="GMKP.cpp" />
     <ClCompile Include="GMKP_CONCERT.cpp" />
     <ClCompile Include="GMKP_CPX.cpp" />
+    <ClCompile Include="LP2MOD.cpp" />
     <ClCompile Include="pugixml.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CHECK_CONS.h" />
     <ClInclude Include="GMKP_CONCERT.h" />
     <ClInclude Include="GMKP_CPX.h" />
+    <ClInclude Include="LP2MOD.h" />
     <ClInclude Include="pugiconfig.hpp" />
     <ClInclude Include="pugixml.hpp" />
   </ItemGroup>

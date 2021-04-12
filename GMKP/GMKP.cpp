@@ -12,6 +12,7 @@
 
 #include "GMKP_CPX.h"
 #include "GMKP_CONCERT.h"
+#include "LP2MOD.h"
 
 using namespace std;
 
@@ -89,6 +90,7 @@ int main(int argc, char **argv) {
 	char istanceFilename[200];
 	char modelFilename[200];
 	char logFilename[200];
+	char modFilename[200];
 
 	int sum_weights;
 	int * capacities_i;
@@ -269,6 +271,16 @@ int main(int argc, char **argv) {
 
 		//std::cout << std::endl;
 		//status = solveGMKP_CONCERT(n, m, r, b, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, true);
+
+		// model cplex into a .mod file
+		strcpy(modFilename, "convert/model_");
+		std::stringstream strs4;
+		strs4 << inst + 1 << ".mod";
+		temp_str = strs4.str();
+		char_type = (char*)temp_str.c_str();
+		strcat(modFilename, char_type);
+
+		convertLpToMod(n, m, r, b, weights, profits, capacities, setups, classes, indexes, modFilename);
 
 
 	} // istances
