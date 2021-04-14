@@ -12,7 +12,7 @@
 
 #include "GMKP_CPX.h"
 #include "GMKP_CONCERT.h"
-#include "LP2MOD.h"
+#include "MOD_CONV.h"
 
 using namespace std;
 
