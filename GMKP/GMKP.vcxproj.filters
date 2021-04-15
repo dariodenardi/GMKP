@@ -30,7 +30,7 @@
     <ClCompile Include="GMKP_CONCERT.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="MOD_CONV.cpp">
+    <ClCompile Include="OPL_CONV.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,7 +50,7 @@
     <ClInclude Include="GMKP_CONCERT.h">
       <Filter>File di origine</Filter>
     </ClInclude>
-    <ClInclude Include="MOD_CONV.h">
+    <ClInclude Include="OPL_CONV.h">
       <Filter>File di origine</Filter>
     </ClInclude>
   </ItemGroup>
