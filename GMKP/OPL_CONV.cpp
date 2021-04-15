@@ -1,6 +1,6 @@
 #include "OPL_CONV.h"
 
-int convertLpToMod(int n, int m, int r, int * b, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes, char * modFilename) {
+int convertToOPL(int n, int m, int r, int * b, int * weights, int * profits, int * capacities, int * setups, int * classes, int * indexes, char * modFilename) {
 
 	std::ofstream outfile(modFilename);
 

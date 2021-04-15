@@ -56,6 +56,10 @@ int main(int argc, char **argv) {
 	std::string library = doc.child("Config").child("library").attribute("name").as_string();
 	std::cout << "library used: " << library << std::endl;
 
+	// opl enabled
+	bool oplIsEnabled = doc.child("Config").child("opl").attribute("enable").as_bool();
+	std::cout << "opl enabled: " << oplIsEnabled << std::endl;
+
 	// timeout
 	int TL = doc.child("Config").child("timeout").attribute("value").as_int();
 	std::cout << "timeout: " << TL << "s" << std::endl;
@@ -273,15 +277,16 @@ int main(int argc, char **argv) {
 		//status = solveGMKP_CONCERT(n, m, r, b, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, true);
 
 		// model cplex into a .mod file
-		strcpy(modFilename, "convert/model_");
-		std::stringstream strs4;
-		strs4 << inst + 1 << ".mod";
-		temp_str = strs4.str();
-		char_type = (char*)temp_str.c_str();
-		strcat(modFilename, char_type);
+		if (oplIsEnabled) {
+			strcpy(modFilename, "convert/model_");
+			std::stringstream strs4;
+			strs4 << inst + 1 << ".mod";
+			temp_str = strs4.str();
+			char_type = (char*)temp_str.c_str();
+			strcat(modFilename, char_type);
 
-		convertLpToMod(n, m, r, b, weights, profits, capacities, setups, classes, indexes, modFilename);
-
+			convertToOPL(n, m, r, b, weights, profits, capacities, setups, classes, indexes, modFilename);
+		}
 
 	} // istances
 
