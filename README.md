@@ -1,8 +1,17 @@
 # GMKP
 
+Mathematical model of the Generalized Multiple Knapsack Problem implemented with CPLEX C ++ API
+
 ## Requirements
 
 * CPLEX must be installed, of course. Academics can obtain it via the [IBM Academic Initiative](https://developer.ibm.com/academic/).
+
+## Programs
+
+You can find releases at the top right.
+
+## Code compilation
+
 * IDE C++ (e.g. Visual Studio)
 
 ### Configuration Visual Studio for CPLEX Libraries
@@ -35,8 +44,8 @@ Code Generation -- For 64 bit windows: code generation:
 Multi-threaded DLL (/MD)
 ```
 
-## Structure
+NOTE: version of CPLEX used is 12.9. In later versions the folders can change
 
 ## License
 
-The present work is distributed under the terms of ghe GNU General Public License v3 (see the `LICENSE` file).
+The source code for the site is licensed under the GNU General Public License v3, which you can find in the LICENSE.md file.
