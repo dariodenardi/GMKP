@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #include <sstream>
-#include <string>
+#include <string.h>
 #include <time.h>
 
 #include <random>
@@ -239,7 +239,7 @@ int main(int argc, char **argv) {
 		strcat(logFilename, char_type);
 
 		// solve problem
-		if (library._Equal("callable library"))
+		if (library.compare("callable library") == 0)
 			status = solveGMKP_CPX(n, m, r, b, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, false);
 		else
 			status = solveGMKP_CONCERT(n, m, r, b, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, false);
@@ -257,7 +257,7 @@ int main(int argc, char **argv) {
 
 		start = clock();
 		// solve problem
-		if (library._Equal("callable library"))
+		if (library.compare("callable library") == 0)
 			status = solveGMKP_CPX(n, m, r, b, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, true);
 		else
 			status = solveGMKP_CONCERT(n, m, r, b, weights, profits, capacities, setups, classes, indexes, modelFilename, logFilename, TL, true);
