@@ -1,3 +1,4 @@
+# Thanks to https://github.com/ampl/mp/blob/master/support/cmake/FindCPLEX.cmake
 # Try to find the CPLEX, Concert, IloCplex and CP Optimizer libraries.
 #
 # Once done this will add the following imported targets:
