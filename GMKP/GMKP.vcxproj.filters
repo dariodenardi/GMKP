@@ -41,17 +41,17 @@
     <ClInclude Include="pugiconfig.hpp">
       <Filter>File di risorse</Filter>
     </ClInclude>
-    <ClInclude Include="GMKP_CPX.h">
-      <Filter>File di origine</Filter>
-    </ClInclude>
     <ClInclude Include="CHECK_CONS.h">
-      <Filter>File di origine</Filter>
+      <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="GMKP_CONCERT.h">
-      <Filter>File di origine</Filter>
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="GMKP_CPX.h">
+      <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="OPL_CONV.h">
-      <Filter>File di origine</Filter>
+      <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
