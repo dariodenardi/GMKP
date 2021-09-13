@@ -56,7 +56,7 @@ target_link_libraries(GMKP cplex-library cplex-concert ilocplex)
 ####### Create directory
 set(CREATE_DIR_LOGS logs)
 set(CREATE_DIR_MODELS models)
-set(CREATE_DIR_INSTANCES istances)
+set(CREATE_DIR_INSTANCES instances)
 set(CREATE_DIR_CONVERT convert)
 
 message(STATUS "Install directory: ${CREATE_DIR_LOGS}")
