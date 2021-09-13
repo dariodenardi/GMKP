@@ -14,7 +14,7 @@ You can find releases at the top right.
 
 * IDE C++ (e.g. Visual Studio)
 
-### Configuration Visual Studio for CPLEX Libraries
+### Configuration Visual Studio 2017 for CPLEX Libraries
 
 Right click on project -- Property
 
