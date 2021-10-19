@@ -34,9 +34,9 @@ _CRT_SECURE_NO_WARNINGS
 
 Linker -- Input -- Additional dependencies:
 ```
-C:\Program Files\IBM\ILOG\CPLEX_Studio129\cplex\lib\x86_windows_vs2012\stat_mda\cplex1260.lib
-C:\Program Files\IBM\ILOG\CPLEX_Studio129\cplex\lib\x86_windows_vs2012\stat_mda\ilocplex.lib
-C:\Program Files\IBM\ILOG\CPLEX_Studio129\concert\lib\x86_windows_vs2012\stat_mda\concert.lib
+C:\Program Files\IBM\ILOG\CPLEX_Studio129\cplex\lib\x64_windows_vs2017\stat_mda\cplex1290.lib
+C:\Program Files\IBM\ILOG\CPLEX_Studio129\cplex\lib\x64_windows_vs2017\stat_mda\ilocplex.lib
+C:\Program Files\IBM\ILOG\CPLEX_Studio129\concert\lib\x64_windows_vs2017\stat_mda\concert.lib
 ```
 
 C/C++ -- Code Generation -- For 64 bit windows: code generation:
