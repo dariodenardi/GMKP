@@ -118,8 +118,8 @@ void add_rows(IloModel model, IloRangeArray capacity, IloRangeArray max_one_bin_
 		capacity.add(IloRange(env, -IloInfinity, capacities[i], name.str().c_str())); // <= C_i
 
 		// add constraint (4):
-		// sum(j belongs Rk) x_ij <= n * y_ik       for all k = 1 .. r
-		// sum(j belongs Rk) x_ij - n * y_ik <= 0   for all k = 1 .. r
+		// sum(j belongs R_k) x_ij <= n * y_ik       for all k = 1 .. r
+		// sum(j belongs R_k) x_ij - n * y_ik <= 0   for all k = 1 .. r
 		for (int k = 0; k < r; k++) {
 			name.str(std::string());
 			name << "dependent_decision_" << i * r + k + 1;
@@ -163,14 +163,14 @@ void add_columns(IloModel model, IloObjective obj, IloRangeArray capacity, IloRa
 
 
 			// constraint (4):
-			// sum(j belongs Rk) x_ij <= n * y_ik       for all k = 1 .. r
+			// sum(j belongs R_k) x_ij <= n * y_ik       for all k = 1 .. r
 			for (int k = 0; k < r; k++) {
 
 				int indexes_prev = k > 0 ? indexes[k - 1] : 0;
 				for (int z = 0; z < indexes[k] - indexes_prev; z++) {
 
 					if (classes[z + indexes_prev] == j) {
-						column_x += dependent_decision[i*r + k](1.0); // sum(j belongs Rk) x_ij
+						column_x += dependent_decision[i*r + k](1.0); // sum(j belongs R_k) x_ij
 					}
 
 				} // j (items)
@@ -206,7 +206,7 @@ void add_columns(IloModel model, IloObjective obj, IloRangeArray capacity, IloRa
 			column_y += capacity[i](setups[k]); // sum(k = 1 ... r) s_k * y_ik 
 
 			// constraint (4):
-			// sum(j belongs Rk) x_ij <= n * y_ik       for all k = 1 .. r
+			// sum(j belongs R_k) x_ij <= n * y_ik       for all k = 1 .. r
 			column_y += dependent_decision[i*r + k](-n); // - n * y_ik
 
 			// constraint (3):
