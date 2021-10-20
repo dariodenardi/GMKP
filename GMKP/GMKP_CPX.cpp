@@ -351,8 +351,8 @@ int solveGMKP_CPX(int n, int m, int r, int * b, int * weights, int * profits, in
 #endif
 
 	/*	constraint (4):
-		sum(j belongs Rk) x_ij <= n * y_ik       for all k = 1 .. r
-		sum(j belongs Rk) x_ij - n * y_ik <= 0   for all k = 1 .. r
+		sum(j belongs R_k) x_ij <= n * y_ik       for all k = 1 .. r
+		sum(j belongs R_k) x_ij - n * y_ik <= 0   for all k = 1 .. r
 	 * */
 
 	rcnt = r*m; // number of constraints (rows)
@@ -386,7 +386,7 @@ int solveGMKP_CPX(int n, int m, int r, int * b, int * weights, int * profits, in
 			rmatval[cc] = -n;
 			cc++;
 
-			// sum(j belongs Rk) x_ij      for all k = 1 .. r
+			// sum(j belongs R_k) x_ij      for all k = 1 .. r
 			for (int j = 0; j < n; j++) {
 
 				int indexes_prev = k > 0 ? indexes[k - 1] : 0;
