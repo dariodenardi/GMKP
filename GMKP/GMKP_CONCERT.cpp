@@ -112,14 +112,14 @@ void add_rows(IloModel model, IloRangeArray capacity, IloRangeArray max_one_bin_
 
 	for (int i = 0; i < m; i++) {
 		// add constraint (1):
-		// sum(j = 1 ... n) w_j * x_ij + sum(k = 1 ... r) s_k * y_ik <= C_i   for all i = 1 .. m
+		// \sum_{j = 1 ... n} w_j * x_ij + \sum_{k = 1 ... r} s_k * y_ik <= C_i		\forall i \in M
 		name.str(std::string());
 		name << "capacity_" << i + 1;
 		capacity.add(IloRange(env, -IloInfinity, capacities[i], name.str().c_str())); // <= C_i
 
 		// add constraint (4):
-		// sum(j belongs R_k) x_ij <= n * y_ik       for all k = 1 .. r
-		// sum(j belongs R_k) x_ij - n * y_ik <= 0   for all k = 1 .. r
+		// \sum_{j \in R_k} x_ij <= n * y_ik			\forall k \in K
+		// \sum_{ j \in R_k } x_ij - n * y_ik <= 0		\forall k \in K
 		for (int k = 0; k < r; k++) {
 			name.str(std::string());
 			name << "dependent_decision_" << i * r + k + 1;
@@ -128,7 +128,7 @@ void add_rows(IloModel model, IloRangeArray capacity, IloRangeArray max_one_bin_
 	} // i (knapsacks)
 
 	// add constraint (2):
-	// sum(i = 1 ... m) x_ij <= 1       for all j = 1 .. n
+	// \sum_{i = 1 ... m} x_ij <= 1       \forall j \in N
 	for (int j = 0; j < n; j++) {
 		name.str(std::string());
 		name << "max_one_bin_x_" << j + 1;
@@ -136,7 +136,7 @@ void add_rows(IloModel model, IloRangeArray capacity, IloRangeArray max_one_bin_
 	} // j (items)
 
 	// add constraint (3):
-	// sum(i = 1 ... m) y_ik <= 1       for all k = 1 .. r
+	// \sum_{i = 1 ... m} y_ik <= b_k		\forall k \in K
 	for (int k = 0; k < r; k++) {
 		name.str(std::string());
 		name << "max_b_bin_y_" << k + 1;
@@ -154,23 +154,22 @@ void add_columns(IloModel model, IloObjective obj, IloRangeArray capacity, IloRa
 			IloNumColumn column_x = obj(profits[i*n + j]);
 
 			// constraint (1):
-			// sum(j = 1 ... n) w_j * x_ij + sum(k = 1 ... r) s_k * y_ik <= C_i   for all i = 1 .. m
-			column_x += capacity[i](weights[j]); // sum(j = 1 ... n) w_j * x_ij
+			// \sum_{j = 1 ... n} w_j * x_ij + \sum_{k = 1 ... r} s_k * y_ik <= C_i		\forall i \in M
+			column_x += capacity[i](weights[j]); // \sum_{j = 1 ... n} w_j * x_ij
 
 			// add constraint (2):
-			// sum(i = 1 ... m) x_ij <= 1       for all j = 1 .. n
+			// \sum_{i = 1 ... m} x_ij <= 1       \forall j \in N
 			column_x += max_one_bin_x[j](1.0);
 
-
 			// constraint (4):
-			// sum(j belongs R_k) x_ij <= n * y_ik       for all k = 1 .. r
+			// \sum_{ j \in R_k } x_ij - n * y_ik <= 0		\forall k \in K
 			for (int k = 0; k < r; k++) {
 
 				int indexes_prev = k > 0 ? indexes[k - 1] : 0;
 				for (int z = 0; z < indexes[k] - indexes_prev; z++) {
 
 					if (classes[z + indexes_prev] == j) {
-						column_x += dependent_decision[i*r + k](1.0); // sum(j belongs R_k) x_ij
+						column_x += dependent_decision[i*r + k](1.0); // \sum_{ j \in R_k } x_ij
 					}
 
 				} // j (items)
@@ -202,16 +201,16 @@ void add_columns(IloModel model, IloObjective obj, IloRangeArray capacity, IloRa
 			IloNumColumn column_y = obj(0.0);
 
 			// constraint (1):
-			// sum(j = 1 ... n) w_j * x_ij + sum(k = 1 ... r) s_k * y_ik <= C_i   for all i = 1 .. m
-			column_y += capacity[i](setups[k]); // sum(k = 1 ... r) s_k * y_ik 
+			// \sum_{j = 1 ... n} w_j * x_ij + \sum_{k = 1 ... r} s_k * y_ik <= C_i		\forall i \in M
+			column_y += capacity[i](setups[k]); // \sum_{k = 1 ... r} s_k * y_ik
 
 			// constraint (4):
-			// sum(j belongs R_k) x_ij <= n * y_ik       for all k = 1 .. r
+			// \sum_{ j \in R_k } x_ij - n * y_ik <= 0		\forall k \in K
 			column_y += dependent_decision[i*r + k](-n); // - n * y_ik
 
 			// constraint (3):
-			// sum(i = 1 ... m) y_ik <= 1       for all k = 1 .. r
-			column_y += max_b_bin_y[k](1.0); // sum(i = 1 ... m) y_ik
+			// \sum_{i = 1 ... m} y_ik <= b_k		\forall k \in K
+			column_y += max_b_bin_y[k](1.0); // \sum_{i = 1 ... m} y_ik
 
 			// create the proper variable for CPLEX, corresponding to y_ik:
 			// y_ik is binary, therefore its LB is 0 and its UB is 1

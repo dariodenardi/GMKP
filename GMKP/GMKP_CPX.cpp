@@ -53,17 +53,17 @@ int solveGMKP_CPX(int n, int m, int r, int * b, int * weights, int * profits, in
 	/*******************************************/
 	/*     add CPLEX columns                   */
 	/*******************************************/
-	/* order of the variables (x_ij) i=1...m (knapsack index), j = 1...n (object index) in CPLEX lp
+	/* order of the variables (x_ij) i = 1...m (knapsack index), j = 1...n (object index) in CPLEX lp
 	 *
-	 * e.g., m=2, n=3
+	 * e.g., m = 2, n = 3
 	 *
 	 * [x_11, x_12, x_13, x_21, x_22, x_23]
 	 *
 	 * */
 
-	/* order of the variables (y_ik) i=1...m (knapsack index), k = 1...r (classes index) in CPLEX lp
+	/* order of the variables (y_ik) i = 1...m (knapsack index), k = 1...r (classes index) in CPLEX lp
 	 *
-	 * e.g., r=2, k=2
+	 * e.g., r = 2, k = 2
 	 *
 	 * [y_11, y_12, y_21, y_22]
 	 *
@@ -161,7 +161,7 @@ int solveGMKP_CPX(int n, int m, int r, int * b, int * weights, int * profits, in
 	/*******************************************/
 
 	/*	constraint (1):
-		sum(j = 1 ... n) w_j * x_ij + sum(k = 1 ... r) s_k * y_ik <= C_i   for all i = 1 .. m
+		\sum_{j = 1 ... n} w_j * x_ij + \sum_{k = 1 ... r} s_k * y_ik <= C_i		\forall i \in M
 	 * */
 	int rcnt = m; // number of constraints (rows)
 	int nzcnt = ccnt; // number of total variables (columns)
@@ -187,7 +187,7 @@ int solveGMKP_CPX(int n, int m, int r, int * b, int * weights, int * profits, in
 		sense[i] = 'L';
 		rhs[i] = capacities[i];
 
-		// sum(j = 1 ... n) w_j * x_ij
+		// \sum_{j = 1 ... n} w_j * x_ij
 		for (int j = 0; j < n; j++)
 		{
 			rmatind[cc] = i * n + j; // variable number
@@ -195,7 +195,7 @@ int solveGMKP_CPX(int n, int m, int r, int * b, int * weights, int * profits, in
 			cc++;
 		}
 
-		// sum(k = 1 ... r) s_k * y_ik 
+		// \sum_{k = 1 ... r} s_k * y_ik
 		for (int k = 0; k < r; k++)
 		{
 			rmatind[cc] = n*m + i * r + k;
@@ -229,7 +229,7 @@ int solveGMKP_CPX(int n, int m, int r, int * b, int * weights, int * profits, in
 #endif
 
 	/*	constraint (2):
-		sum(i = 1 ... m) x_ij <= 1       for all j = 1 .. n
+		\sum_{i = 1 ... m} x_ij <= 1       \forall j \in N
 	 * */
 
 	rcnt = n; // number of constraints (rows)
@@ -290,7 +290,7 @@ int solveGMKP_CPX(int n, int m, int r, int * b, int * weights, int * profits, in
 #endif
 
 	/*	constraint (3):
-		sum(i = 1 ... m) y_ik <= 1       for all k = 1 .. r
+		\sum_{i = 1 ... m} y_ik <= b_k		\forall k \in K
 	 * */
 
 	rcnt = r; // number of constraints (rows)
@@ -351,8 +351,8 @@ int solveGMKP_CPX(int n, int m, int r, int * b, int * weights, int * profits, in
 #endif
 
 	/*	constraint (4):
-		sum(j belongs R_k) x_ij <= n * y_ik       for all k = 1 .. r
-		sum(j belongs R_k) x_ij - n * y_ik <= 0   for all k = 1 .. r
+		\sum_{j \in R_k} x_ij <= n * y_ik			\forall k \in K
+		\sum_{j \in R_k} x_ij - n * y_ik <= 0		\forall k \in K
 	 * */
 
 	rcnt = r*m; // number of constraints (rows)
@@ -377,7 +377,7 @@ int solveGMKP_CPX(int n, int m, int r, int * b, int * weights, int * profits, in
 	for (int i = 0; i < m; i++) {
 		for (int k = 0; k < r; k++) {
 
-			// - n * y_ik       for all k = 1 .. r
+			// - n * y_ik	\forall k \in K
 			rmatbeg[i * r + k] = cc; // starting index of the n-th constraint
 			sense[i * r + k] = 'L';
 			rhs[i * r + k] = 0.0;
@@ -386,7 +386,7 @@ int solveGMKP_CPX(int n, int m, int r, int * b, int * weights, int * profits, in
 			rmatval[cc] = -n;
 			cc++;
 
-			// sum(j belongs R_k) x_ij      for all k = 1 .. r
+			// \sum_{j \in R_k} x_ij
 			for (int j = 0; j < n; j++) {
 
 				int indexes_prev = k > 0 ? indexes[k - 1] : 0;
@@ -428,13 +428,16 @@ int solveGMKP_CPX(int n, int m, int r, int * b, int * weights, int * profits, in
 #endif
 
 #ifdef WRITELP
-	CPXwriteprob(env, lp, modelFilename, NULL);
+	status = CPXwriteprob(env, lp, modelFilename, NULL);
+	if (status) {
+		std::cout << "error: GMKP failed to write MODEL file" << std::endl;
+	}
 #endif
 
 #ifdef WRITELOG
 	status = CPXsetlogfilename(env, logFilename, "w");
 	if (status) {
-		std::cout << "error: GMKP failed to set LOG file" << std::endl;
+		std::cout << "error: GMKP failed to write LOG file" << std::endl;
 	}
 #endif
 
