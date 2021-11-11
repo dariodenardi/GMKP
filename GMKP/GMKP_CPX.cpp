@@ -576,24 +576,18 @@ int solveGMKP_CPX(int n, int m, int r, int * b, int * weights, int * profits, in
 
 		int statusCheck = checkSolution(x, objval, n, m, r, b, weights, profits, capacities, setups, classes, indexes);
 
-		if (statusCheck == 0) {
+		if (statusCheck == 0)
 			std::cout << "All constraints are ok" << std::endl;
-		}
-		else if (statusCheck == 1) {
+		else if (statusCheck == 1)
 			std::cout << "Constraint violated: weights of the items are greater than the capacity..." << std::endl;
-		}
-		else if (statusCheck == 2) {
+		else if (statusCheck == 2)
 			std::cout << "Constraint violated: item is assigned to more than one knapsack..." << std::endl;
-		}
-		else if (statusCheck == 3) {
+		else if (statusCheck == 3)
 			std::cout << "Constraint violated: class is assigned to more than one knapsack..." << std::endl;
-		}
-		else if (statusCheck == 4) {
+		else if (statusCheck == 4)
 			std::cout << "Constraint violated: items of class are not assigned to knapsack..." << std::endl;
-		}
-		else if (statusCheck == 5) {
+		else if (statusCheck == 5)
 			std::cout << "Optimal solution violeted..." << std::endl;
-		}
 
 		delete[] x;
 	}
