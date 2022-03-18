@@ -5,7 +5,11 @@ int convertToOPL(int n, int m, int r, int * b, int * weights, int * profits, int
 	std::ofstream outfile(modFilename);
 
 	auto time = std::time(nullptr);
+#ifdef APPLE
+	std::cout.imbue(std::locale("en_US.UTF-8"));
+#elif
 	std::cout.imbue(std::locale("en_US.utf8"));
+#endif
 
 	outfile << "/*********************************************" << std::endl;
 	outfile << " * OPL 12.9.0.0 Model" << std::endl;

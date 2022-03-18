@@ -48,6 +48,10 @@ endif ()
 file(GLOB HEADER_FILES include/*.h)
 file(GLOB SOURCE_FILES src/*.cpp)
 
+if(APPLE)
+    message("Adding -DAPPLE")
+    add_definitions(-DAPPLE)
+endif()
 ######## Set executable file name, and add the source files for it.
 add_executable(GMKP ${HEADER_FILES} ${SOURCE_FILES})
 ######## Add Dependency Library
